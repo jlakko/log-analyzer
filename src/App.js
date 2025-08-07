@@ -220,11 +220,11 @@ const reorderColumns = (allColumns, timestampColumns) => {
 
 // Icon for sorting arrows
 const SortIcon = ({ direction }) => {
-    if (!direction) return <svg className="h-4 w-4 inline-block text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>;
+    if (!direction) return <svg className="h-4 w-4 inline-block text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>;
     return direction === 'ascending' ? (
-        <svg className="h-4 w-4 inline-block text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" /></svg>
+        <svg className="h-4 w-4 inline-block text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" /></svg>
     ) : (
-        <svg className="h-4 w-4 inline-block text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+        <svg className="h-4 w-4 inline-block text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
     );
 };
 
@@ -279,7 +279,7 @@ const FileUploader = ({ onFileUpload, setIsLoading, setError }) => {
 
     return (
         <div 
-            className="w-full p-8 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-blue-500 hover:bg-gray-50 transition-colors"
+            className="w-full p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onClick={() => document.getElementById('file-input').click()}
@@ -291,13 +291,13 @@ const FileUploader = ({ onFileUpload, setIsLoading, setError }) => {
                 accept=".json,.log"
                 onChange={handleFileChange}
             />
-            <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+            <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                 <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <p className="mt-4 text-lg text-gray-600">
-                <span className="font-semibold text-blue-600">Click to upload</span> or drag and drop
+            <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+                <span className="font-semibold text-blue-600 dark:text-blue-500">Click to upload</span> or drag and drop
             </p>
-            <p className="mt-1 text-sm text-gray-500">Newline-delimited JSON files (.json, .log)</p>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Newline-delimited JSON files (.json, .log)</p>
         </div>
     );
 };
@@ -308,6 +308,10 @@ export default function App() {
     // --- STATE MANAGEMENT ---
     const [allLogs, setAllLogs] = useState([]);
     const [fileName, setFileName] = useState(null);
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        const savedMode = localStorage.getItem('darkMode');
+        return savedMode === 'true' || false;
+    });
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -366,6 +370,17 @@ export default function App() {
             setSortConfig({ key: null, direction: null });
         }
     }, [allLogs]);
+
+    // Effect to apply dark mode
+    useEffect(() => {
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('darkMode', 'true');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('darkMode', 'false');
+        }
+    }, [isDarkMode]);
     
     // Memoized filtered and sorted logs
     const processedLogs = useMemo(() => {
@@ -509,12 +524,12 @@ export default function App() {
     const availableTimezones = useMemo(() => getTimezones(), []);
 
     return (
-        <div className="bg-gray-50 min-h-screen font-sans text-gray-800">
+        <div className="bg-gray-50 dark:bg-gray-900 min-h-screen font-sans text-gray-800 dark:text-gray-200">
             <div className="container mx-auto p-4 sm:p-6 lg:p-8">
                 <header className="mb-8 flex justify-between items-start">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Log Analyzer</h1>
-                        <p className="text-gray-600 mt-1">
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Log Analyzer</h1>
+                        <p className="text-gray-600 dark:text-gray-400 mt-1">
                             {fileName ? `Analyzing: ${fileName}` : "Upload a log file to begin."}
                         </p>
                         {logStructure.columns.length > 0 && (
@@ -526,14 +541,27 @@ export default function App() {
                             </p>
                         )}
                     </div>
-                    {fileName && (
+                    <div className="flex items-center gap-4">
                         <button
-                            onClick={clearData}
-                            className="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 transition-colors"
+                            onClick={() => setIsDarkMode(!isDarkMode)}
+                            className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                            aria-label="Toggle dark mode"
                         >
-                            Upload New File
+                            {isDarkMode ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                            )}
                         </button>
-                    )}
+                        {fileName && (
+                            <button
+                                onClick={clearData}
+                                className="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 transition-colors"
+                            >
+                                Upload New File
+                            </button>
+                        )}
+                    </div>
                 </header>
 
                 {isLoading && <div className="text-center p-8 font-semibold">Loading and processing file...</div>}
@@ -557,8 +585,8 @@ export default function App() {
                     <>
                         {/* Timestamp Controls - only show if timestamp columns detected */}
                         {logStructure.timestampColumns.length > 0 && (
-                            <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-                                <h2 className="text-xl font-semibold mb-4">Timestamp Display</h2>
+                            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md mb-6">
+                                <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">Timestamp Display</h2>
                                 <div className="flex flex-col gap-4">
                                     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                                         <label className="flex items-center">
@@ -566,20 +594,20 @@ export default function App() {
                                                 type="checkbox"
                                                 checked={humanReadableTime}
                                                 onChange={(e) => setHumanReadableTime(e.target.checked)}
-                                                className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                className="mr-2 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
                                             />
-                                            <span className="text-sm font-medium text-gray-700">Convert to human readable format</span>
+                                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Convert to human readable format</span>
                                         </label>
                                         {humanReadableTime && (
                                             <div className="flex items-center gap-2">
-                                                <label htmlFor="timezone-select" className="text-sm font-medium text-gray-700">
+                                                <label htmlFor="timezone-select" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                                     Timezone:
                                                 </label>
                                                 <select
                                                     id="timezone-select"
                                                     value={selectedTimezone}
                                                     onChange={(e) => setSelectedTimezone(e.target.value)}
-                                                    className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                                    className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-gray-200"
                                                 >
                                                     {availableTimezones.map(tz => (
                                                         <option key={tz} value={tz}>{tz}</option>
@@ -592,7 +620,7 @@ export default function App() {
                                     {/* Individual timestamp column toggles */}
                                     {humanReadableTime && logStructure.timestampColumns.length > 0 && (
                                         <div>
-                                            <h3 className="text-sm font-medium text-gray-700 mb-2">Timestamp Columns:</h3>
+                                            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Timestamp Columns:</h3>
                                             <div className="flex flex-wrap gap-3">
                                                 {logStructure.timestampColumns.map(columnKey => (
                                                     <label key={columnKey} className="flex items-center text-sm">
@@ -600,13 +628,13 @@ export default function App() {
                                                             type="checkbox"
                                                             checked={enabledTimestampColumns.has(columnKey)}
                                                             onChange={() => handleTimestampColumnToggle(columnKey)}
-                                                            className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                            className="mr-2 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
                                                         />
-                                                        <span className="text-gray-600">{getColumnDisplayName(columnKey)}</span>
+                                                        <span className="text-gray-600 dark:text-gray-400">{getColumnDisplayName(columnKey)}</span>
                                                     </label>
                                                 ))}
                                             </div>
-                                            <p className="text-xs text-gray-500 mt-2">
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                                                 Uncheck columns that were incorrectly detected as timestamps
                                             </p>
                                         </div>
@@ -616,12 +644,12 @@ export default function App() {
                         )}
 
                         {/* Filter Section */}
-                        <div className="bg-white p-4 rounded-lg shadow-md mb-8">
+                        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md mb-8">
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-semibold">Filters</h2>
+                                <h2 className="text-xl font-semibold dark:text-gray-100">Filters</h2>
                                 <button
                                     onClick={clearAllFilters}
-                                    className="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors"
+                                    className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                                 >
                                     Clear All Filters
                                 </button>
@@ -635,30 +663,30 @@ export default function App() {
                                         placeholder={`Filter by ${getColumnDisplayName(columnKey)}...`}
                                         value={filters[columnKey] || ''}
                                         onChange={handleFilterChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm"
+                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm bg-white dark:bg-gray-700 dark:text-gray-200"
                                     />
                                 ))}
                             </div>
-                            <p className="text-xs text-gray-500 mt-3">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
                                 💡 Tip: Click on any cell value in the table below to filter by that value
                             </p>
                         </div>
 
                         {/* Table Section */}
-                        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
                             <div className="overflow-x-auto">
-                                 <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-gray-100">
+                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                    <thead className="bg-gray-100 dark:bg-gray-700">
                                         <tr>
                                             {orderedColumns.map(columnKey => (
                                                 <th 
                                                     key={columnKey} 
                                                     scope="col" 
-                                                    className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-200 whitespace-nowrap"
+                                                    className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 whitespace-nowrap"
                                                     onClick={() => requestSort(columnKey)}
                                                 >
                                                     <div className="flex items-center gap-1">
-                                                        <span className={logStructure.timestampColumns.includes(columnKey) ? 'text-blue-600' : ''}>
+                                                        <span className={logStructure.timestampColumns.includes(columnKey) ? 'text-blue-600 dark:text-blue-400' : ''}>
                                                             {getColumnDisplayName(columnKey)}
                                                         </span>
                                                         <SortIcon direction={sortConfig.key === columnKey ? sortConfig.direction : null} />
@@ -667,9 +695,9 @@ export default function App() {
                                             ))}
                                         </tr>
                                     </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
+                                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                         {paginatedLogs.map((log, index) => (
-                                            <tr key={index} className="hover:bg-gray-50">
+                                            <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                                 {orderedColumns.map(columnKey => {
                                                     const value = getNestedValue(log, columnKey);
                                                     const shouldFormat = shouldFormatAsTimestamp(columnKey);
@@ -690,9 +718,9 @@ export default function App() {
                                                     const filterValue = value !== undefined ? value : null;
                                                     
                                                     return (
-                                                        <td key={columnKey} className="px-4 py-4 text-sm text-gray-700 max-w-xs">
+                                                        <td key={columnKey} className="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs">
                                                             <div 
-                                                                className="truncate cursor-pointer hover:bg-blue-50 hover:text-blue-700 rounded px-1 py-0.5 transition-colors" 
+                                                                className="truncate cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900 hover:text-blue-700 dark:hover:text-blue-300 rounded px-1 py-0.5 transition-colors"
                                                                 title={`Click to filter by: ${displayValue}`}
                                                                 onClick={() => handleCellClick(columnKey, filterValue)}
                                                             >
@@ -707,13 +735,13 @@ export default function App() {
                                 </table>
                             </div>
                             {processedLogs.length === 0 && (
-                                <p className="text-center py-8 text-gray-500">No logs match the current filters.</p>
+                                <p className="text-center py-8 text-gray-500 dark:text-gray-400">No logs match the current filters.</p>
                             )}
                         </div>
                         
                         {/* Pagination Controls */}
                         <div className="flex items-center justify-between mt-6">
-                             <div className="text-sm text-gray-600">
+                             <div className="text-sm text-gray-600 dark:text-gray-400">
                                 Showing {paginatedLogs.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}
                                 - {Math.min(currentPage * itemsPerPage, processedLogs.length)} of {processedLogs.length} results
                             </div>
@@ -721,15 +749,15 @@ export default function App() {
                                 <button
                                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                     disabled={currentPage === 1}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                                 >
                                     Previous
                                 </button>
-                                <span className="text-sm text-gray-700">Page {currentPage} of {totalPages}</span>
+                                <span className="text-sm text-gray-700 dark:text-gray-300">Page {currentPage} of {totalPages}</span>
                                 <button
                                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                     disabled={currentPage === totalPages || totalPages === 0}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                                 >
                                     Next
                                 </button>
